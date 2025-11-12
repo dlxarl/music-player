@@ -3,8 +3,10 @@ package ui;
 import player.AudioPlayer;
 import player.Playlist;
 import util.FileUtils;
+import util.FontUtils;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
@@ -16,69 +18,83 @@ public class AudioPlayerUI extends JFrame {
     private final DefaultListModel<String> listModel = new DefaultListModel<>();
     private final JList<String> trackList = new JList<>(listModel);
     private final JProgressBar progressBar = new JProgressBar();
-    private final JLabel currentTimeLabel = new JLabel("00:00");
-    private final JLabel totalTimeLabel = new JLabel("00:00");
+    private final JLabel currentTimeLabel = new JLabel("00:30");
+    private final JLabel totalTimeLabel = new JLabel("03:20");
 
     public AudioPlayerUI() {
         setTitle("Music Player");
-        setSize(600, 250);
+        setSize(400, 350);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Верхня панель: прогрес-бар + таймер
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(progressBar, BorderLayout.NORTH);
+        // Main panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(new Color(28, 28, 28));
+        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        add(mainPanel);
 
-        JPanel timePanel = new JPanel(new BorderLayout());
-        timePanel.add(currentTimeLabel, BorderLayout.WEST);
-        timePanel.add(totalTimeLabel, BorderLayout.EAST);
-        topPanel.add(timePanel, BorderLayout.SOUTH);
+        // Top content panel (vertical layout)
+        JPanel topContent = new JPanel();
+        topContent.setLayout(new BoxLayout(topContent, BoxLayout.Y_AXIS));
+        topContent.setOpaque(false);
 
-        add(topPanel, BorderLayout.NORTH);
+        // Cover image
+        JLabel coverLabel = new JLabel();
+        coverLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        coverLabel.setPreferredSize(new Dimension(70, 70));
+        coverLabel.setIcon(loadImage("/images/nxrt-december-256.png", 70));
+        topContent.add(coverLabel);
 
-        // Плейлист + кнопка Add...
-        trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        trackList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                int index = trackList.getSelectedIndex();
-                player.play(index);
-            }
-        });
+        // Spacing
+        topContent.add(Box.createVerticalStrut(8));
 
-        JPanel playlistPanel = new JPanel(new BorderLayout());
+        // Title and artist labels
+        JLabel titleLabel = new JLabel("december");
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setFont(FontUtils.loadCustomFont("/fonts/Montserrat-Medium.ttf", 18f));
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JScrollPane scrollPane = new JScrollPane(trackList);
-        scrollPane.setPreferredSize(new Dimension(200, 150));
-        playlistPanel.add(scrollPane, BorderLayout.CENTER);
+        JLabel artistLabel = new JLabel("nxrt");
+        artistLabel.setForeground(new Color(110, 110, 110));
+        artistLabel.setFont(FontUtils.loadCustomFont("/fonts/Montserrat-Medium.ttf", 16f));
+        artistLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton addBtn = new JButton("Add...");
-        addBtn.addActionListener(e -> openFileChooser());
-        playlistPanel.add(addBtn, BorderLayout.SOUTH);
+        topContent.add(Box.createVerticalStrut(15));
 
-        add(playlistPanel, BorderLayout.WEST);
+        topContent.add(titleLabel);
+        topContent.add(Box.createVerticalStrut(4));
+        topContent.add(artistLabel);
 
-        // Кнопки керування
-        JButton playBtn = new JButton("▶");
-        JButton pauseBtn = new JButton("⏸");
-        JButton nextBtn = new JButton("⏭");
-        JButton prevBtn = new JButton("⏮");
+        // Icon panel (top-right)
+        JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        iconPanel.setOpaque(false);
 
-        playBtn.addActionListener(e -> player.resume());
-        pauseBtn.addActionListener(e -> player.pause());
-        nextBtn.addActionListener(e -> player.next());
-        prevBtn.addActionListener(e -> player.previous());
+        // Завантаження іконки з масштабуванням
+        ImageIcon folderIcon = loadImage("/icons/512x512/folder.png", 20);
 
-        JPanel controlPanel = new JPanel(new FlowLayout());
-        controlPanel.add(prevBtn);
-        controlPanel.add(playBtn);
-        controlPanel.add(pauseBtn);
-        controlPanel.add(nextBtn);
+// Кнопка з іконкою
+        JButton iconBtn = new JButton(folderIcon);
+        iconBtn.setPreferredSize(new Dimension(24, 24)); // трішки більше для відступів
+        iconBtn.setBackground(new Color(40, 40, 40));
+        iconBtn.setBorderPainted(false);
+        iconBtn.setFocusPainted(false);
+        iconBtn.setContentAreaFilled(false); // щоб фон не затирав іконку
 
-        add(controlPanel, BorderLayout.CENTER);
+        iconPanel.add(iconBtn);
 
-        // Таймер оновлення
-        Timer timer = new Timer(1000, e -> updateProgress());
-        timer.start();
+        // Wrapper panel for top section
+        JPanel topWrapper = new JPanel(new BorderLayout());
+        topWrapper.setOpaque(false);
+        topWrapper.add(topContent, BorderLayout.WEST);
+        topWrapper.add(iconPanel, BorderLayout.EAST);
+
+        mainPanel.add(topWrapper, BorderLayout.NORTH);
+
+        // Progress bar
+        ProgressBar progressBar = new ProgressBar();
+        mainPanel.add(progressBar, BorderLayout.SOUTH);
+
+        progressBar.setProgress(player.getCurrentSeconds(), player.getTotalSeconds());
 
         setVisible(true);
     }
@@ -94,7 +110,7 @@ public class AudioPlayerUI extends JFrame {
                     playlist.add(file.getAbsolutePath());
                     listModel.addElement(file.getName());
                 } else {
-                    JOptionPane.showMessageDialog(this, "Непідтримуваний формат: " + name);
+                    JOptionPane.showMessageDialog(this, "Unsupported format: " + name);
                 }
             }
         }
@@ -108,6 +124,17 @@ public class AudioPlayerUI extends JFrame {
             progressBar.setValue(current);
             currentTimeLabel.setText(FileUtils.formatTime(current));
             totalTimeLabel.setText(FileUtils.formatTime(total));
+        }
+    }
+
+    private ImageIcon loadImage(String resourcePath, int size) {
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource(resourcePath));
+            Image scaled = icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
+        } catch (Exception e) {
+            System.out.println("Unable to load image: " + e.getMessage());
+            return null;
         }
     }
 }
