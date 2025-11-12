@@ -2,8 +2,11 @@ package ui;
 
 import player.AudioPlayer;
 import player.Playlist;
+
 import util.FileUtils;
 import util.FontUtils;
+import util.IconLoader;
+import util.ImageLoader;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -42,7 +45,7 @@ public class AudioPlayerUI extends JFrame {
         JLabel coverLabel = new JLabel();
         coverLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         coverLabel.setPreferredSize(new Dimension(70, 70));
-        coverLabel.setIcon(loadImage("/images/nxrt-december-256.png", 70));
+        coverLabel.setIcon(ImageLoader.loadRasterImage("/images/nxrt-december-256.png", 70));
         topContent.add(coverLabel);
 
         // Spacing
@@ -69,16 +72,15 @@ public class AudioPlayerUI extends JFrame {
         JPanel iconPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         iconPanel.setOpaque(false);
 
-        // Завантаження іконки з масштабуванням
-        ImageIcon folderIcon = loadImage("/icons/512x512/folder.png", 20);
-
-// Кнопка з іконкою
+        // Icon
+        ImageIcon folderIcon = IconLoader.loadSvgIcon("/icons/svg/folder.svg", 24);
         JButton iconBtn = new JButton(folderIcon);
-        iconBtn.setPreferredSize(new Dimension(24, 24)); // трішки більше для відступів
+        iconBtn.setPreferredSize(new Dimension(24, 24));
         iconBtn.setBackground(new Color(40, 40, 40));
         iconBtn.setBorderPainted(false);
         iconBtn.setFocusPainted(false);
-        iconBtn.setContentAreaFilled(false); // щоб фон не затирав іконку
+        iconBtn.setContentAreaFilled(false);
+        iconBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         iconPanel.add(iconBtn);
 
@@ -124,17 +126,6 @@ public class AudioPlayerUI extends JFrame {
             progressBar.setValue(current);
             currentTimeLabel.setText(FileUtils.formatTime(current));
             totalTimeLabel.setText(FileUtils.formatTime(total));
-        }
-    }
-
-    private ImageIcon loadImage(String resourcePath, int size) {
-        try {
-            ImageIcon icon = new ImageIcon(getClass().getResource(resourcePath));
-            Image scaled = icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH);
-            return new ImageIcon(scaled);
-        } catch (Exception e) {
-            System.out.println("Unable to load image: " + e.getMessage());
-            return null;
         }
     }
 }

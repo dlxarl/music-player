@@ -16,8 +16,8 @@ dependencies {
     implementation("com.googlecode.soundlibs:basicplayer:3.0.0.0")
     implementation("com.googlecode.soundlibs:mp3spi:1.9.5.4")
     implementation("com.googlecode.soundlibs:tritonus-share:0.3.7.4")
+    implementation("com.formdev:svgSalamander:1.1.4")
 
-    // SLF4J API + простий логер
     implementation("org.slf4j:slf4j-api:1.7.36")
     implementation("org.slf4j:slf4j-simple:1.7.36")
 }
