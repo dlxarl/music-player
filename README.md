@@ -1,62 +1,41 @@
 # Music Player
 
-A lightweight desktop audio player built with Java and Swing. The project provides a minimal dark interface for loading and playing local audio files, with a simple playlist model and playback controls.
+A lightweight desktop music player project built with Java Swing. It combines a minimal dark-themed interface, a BasicPlayer-based audio playback layer, and a simple playlist model.
 
-## Features
+## Overview
 
-- Desktop user interface built with Java Swing
-- Load multiple local audio files through a file chooser
-- Basic playback operations: play, pause, resume, stop, next, and previous
-- Simple playlist management
-- Playback progress and elapsed-time tracking
-- Custom interface elements, including a painted progress bar
-- SVG icons, album artwork, and custom Montserrat fonts
-- Audio playback powered by BasicPlayer
+The project is organized into three main parts:
 
-## Supported Formats
+- **Player** — wraps BasicPlayer and exposes playback operations such as play, pause, resume, stop, next, and previous.
+- **Playlist** — stores the paths of audio tracks and provides basic indexed access.
+- **UI** — provides a Swing window, custom progress-bar drawing, track artwork, icons, and typography assets.
 
-The player currently filters and loads MP3 and WAV files through the graphical file chooser.
+## Current Features
 
-The audio format utility also lists MP3, WAV, OGG, and AAC as supported extensions, but the current UI does not expose OGG or AAC file selection.
+- Java Swing desktop window with a minimal dark theme
+- Audio playback layer based on BasicPlayer
+- Basic playlist data model
+- Playback state and elapsed-time tracking in the audio layer
+- Custom-drawn progress bar component
+- SVG icon loading and raster image scaling
+- Bundled Montserrat fonts and interface assets
+- File chooser code configured for selecting multiple MP3 and WAV files
+
+## Audio Formats
+
+The file chooser implementation is configured to filter **MP3** and **WAV** files.
+
+The separate `AudioFormatSupport` helper recognizes the extensions MP3, WAV, OGG, and AAC. This helper only checks file extensions; actual decoding depends on the available playback codecs and libraries.
 
 ## Tech Stack
 
 - Java
 - Java Swing / AWT
-- Gradle (Kotlin DSL)
+- Gradle with Kotlin DSL
 - BasicPlayer
 - MP3 SPI
+- Tritonus Share
 - SVG Salamander
-
-## Requirements
-
-- JDK 17 or newer
-- Gradle Wrapper (included)
-
-## Getting Started
-
-Clone the repository:
-
-```bash
-git clone https://github.com/dlxarl/music-player.git
-cd music-player
-```
-
-Run the application using the Gradle Wrapper:
-
-On macOS / Linux:
-
-```bash
-./gradlew run
-```
-
-On Windows:
-
-```bat
-gradlew.bat run
-```
-
-> Note: The project currently defines Java and test dependencies but does not declare a Gradle `application` plugin or a `run` task. To launch it from Gradle, configure an application entry point or run the compiled `Main` class from your IDE.
 
 ## Project Structure
 
@@ -84,9 +63,36 @@ src/
         └── images/
 ```
 
-## Current Status
+## Getting Started
 
-This is an experimental project and is still under development. Some interface components and playback interactions are not fully wired up yet. The current implementation is best viewed as a foundation for a compact desktop music player rather than a feature-complete media application.
+Clone the repository:
+
+```bash
+git clone https://github.com/dlxarl/music-player.git
+cd music-player
+```
+
+Build the project:
+
+On macOS / Linux:
+
+```bash
+./gradlew build
+```
+
+On Windows:
+
+```bat
+gradlew.bat build
+```
+
+To launch the application, import the project into an IDE as a Gradle project and run the `Main` class.
+
+> The current Gradle configuration applies the Java plugin but does not define an `application` plugin or a `run` task.
+
+## Development Status
+
+This repository is an early-stage implementation. The playback layer and several UI components exist, but the graphical interface is not yet fully wired to the player: for example, the file chooser method is not connected to the folder button, and the progress display is not yet updated from playback events. Expect incomplete interactions and ongoing development.
 
 ## License
 
